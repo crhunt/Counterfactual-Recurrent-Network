@@ -1,7 +1,10 @@
 # Copyright (c) 2020, Ioana Bica
 
-import tensorflow as tf
-from tensorflow.contrib.rnn import LSTMCell, DropoutWrapper
+#import tensorflow as tf
+import tensorflow.compat.v1 as tf
+#tf.disable_v2_behavior()
+#from tensorflow.contrib.rnn import LSTMCell, DropoutWrapper
+from tensorflow.compat.v1.nn.rnn_cell import LSTMCell, DropoutWrapper
 from tensorflow.python.ops import rnn
 
 from utils.flip_gradient import flip_gradient
@@ -28,7 +31,9 @@ class CRN_Model:
 
         self.b_train_decoder = b_train_decoder
 
+        tf.disable_v2_behavior()
         tf.reset_default_graph()
+        #tf.compat.v1.reset_default_graph()
 
         self.current_covariates = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_covariates])
 
