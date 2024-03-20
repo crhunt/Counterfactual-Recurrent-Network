@@ -35,19 +35,42 @@ class CRN_Model:
         tf.reset_default_graph()
         #tf.compat.v1.reset_default_graph()
 
-        self.current_covariates = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_covariates])
+        #self.current_covariates = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_covariates])
+        self.current_covariates = tf.keras.Input(name="current_covariates", \
+                                                 shape=(None, self.max_sequence_length, self.num_covariates), \
+                                                 dtype=tf.dtypes.float32)
 
         # Initial previous treatment needs to consist of zeros (this is done when building the feed dictionary)
-        self.previous_treatments = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_treatments])
-        self.current_treatments = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_treatments])
-        self.outputs = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_outputs])
-        self.active_entries = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_outputs])
+        #self.previous_treatments = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_treatments])
+        self.previous_treatments = tf.keras.Input(name="previous_treatments", \
+                                                  shape=(None, self.max_sequence_length, self.num_treatments), \
+                                                  dtype=tf.dtypes.float32)
+        #self.current_treatments = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_treatments])
+        self.current_treatments = tf.keras.Input(name="current_treatments", \
+                                                 shape=(None, self.max_sequence_length, self.num_treatments), \
+                                                 dtype=tf.dtypes.float32)
+        #self.outputs = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_outputs])
+        self.outputs = tf.keras.Input(name="outputs", \
+                                      shape=(None, self.max_sequence_length, self.num_outputs), \
+                                      dtype=tf.dtypes.float32)
+        #self.active_entries = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_outputs])
+        self.active_entries = tf.keras.Input(name="active_entries", \
+                                             shape=(None, self.max_sequence_length, self.num_outputs), \
+                                             dtype=tf.dtypes.float32)
 
-        self.init_state = None
+        self.init_state = tf.keras.Input(name="init_state", \
+                                         shape=(), \
+                                         dtype=tf.dtypes.float32)
         if (self.b_train_decoder):
-            self.init_state = tf.placeholder(tf.float32, [None, self.rnn_hidden_units])
+            #self.init_state = tf.placeholder(tf.float32, [None, self.rnn_hidden_units])
+            self.init_state = tf.keras.Input(name="init_state", \
+                                             shape=(None, self.rnn_hidden_units), \
+                                             dtype=tf.dtypes.float32)
 
-        self.alpha = tf.placeholder(tf.float32, [])  # Gradient reversal scalar
+        #self.alpha = tf.placeholder(tf.float32, [])  # Gradient reversal scalar
+        self.alpha = tf.keras.Input(name="alpha", \
+                                    shape=(), \
+                                    dtype=tf.dtypes.float32)
 
     def build_balancing_representation(self):
         self.rnn_input = tf.concat([self.current_covariates, self.previous_treatments], axis=-1)
@@ -79,8 +102,10 @@ class CRN_Model:
     def build_treatment_assignments_one_hot(self, balancing_representation):
         balancing_representation_gr = flip_gradient(balancing_representation, self.alpha)
 
-        treatments_network_layer = tf.layers.dense(balancing_representation_gr, self.fc_hidden_units,
-                                                   activation=tf.nn.elu)
+        #treatments_network_layer = tf.layers.dense(balancing_representation_gr, self.fc_hidden_units,
+        #                                           activation=tf.nn.elu)
+        treatments_network_layer = tf.keras.layers.Dense(units=self.fc_hidden_units, activation=tf.nn.elu)(balancing_representation_gr)
+
         treatment_logit_predictions = tf.layers.dense(treatments_network_layer, self.num_treatments, activation=None)
         treatment_prob_predictions = tf.nn.softmax(treatment_logit_predictions)
 
