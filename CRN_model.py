@@ -1,7 +1,7 @@
 # Copyright (c) 2020, Ioana Bica
 
-#import tensorflow as tf
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
+#import tensorflow.compat.v1 as tf
 #tf.disable_v2_behavior()
 #from tensorflow.contrib.rnn import LSTMCell, DropoutWrapper
 from tensorflow.compat.v1.nn.rnn_cell import LSTMCell, DropoutWrapper
@@ -31,29 +31,37 @@ class CRN_Model:
 
         self.b_train_decoder = b_train_decoder
 
-        tf.disable_v2_behavior()
         tf.reset_default_graph()
         #tf.compat.v1.reset_default_graph()
-
-        #self.current_covariates = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_covariates])
+        """
+        self.current_covariates = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_covariates])
+        """
         self.current_covariates = tf.keras.Input(name="current_covariates", \
                                                  shape=(None, self.max_sequence_length, self.num_covariates), \
                                                  dtype=tf.dtypes.float32)
 
         # Initial previous treatment needs to consist of zeros (this is done when building the feed dictionary)
-        #self.previous_treatments = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_treatments])
+        """
+        self.previous_treatments = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_treatments])
+        """
         self.previous_treatments = tf.keras.Input(name="previous_treatments", \
                                                   shape=(None, self.max_sequence_length, self.num_treatments), \
                                                   dtype=tf.dtypes.float32)
-        #self.current_treatments = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_treatments])
+        """
+        self.current_treatments = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_treatments])
+        """
         self.current_treatments = tf.keras.Input(name="current_treatments", \
                                                  shape=(None, self.max_sequence_length, self.num_treatments), \
                                                  dtype=tf.dtypes.float32)
-        #self.outputs = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_outputs])
+        """
+        self.outputs = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_outputs])
+        """
         self.outputs = tf.keras.Input(name="outputs", \
                                       shape=(None, self.max_sequence_length, self.num_outputs), \
                                       dtype=tf.dtypes.float32)
-        #self.active_entries = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_outputs])
+        """
+        self.active_entries = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_outputs])
+        """
         self.active_entries = tf.keras.Input(name="active_entries", \
                                              shape=(None, self.max_sequence_length, self.num_outputs), \
                                              dtype=tf.dtypes.float32)
@@ -62,36 +70,57 @@ class CRN_Model:
                                          shape=(), \
                                          dtype=tf.dtypes.float32)
         if (self.b_train_decoder):
-            #self.init_state = tf.placeholder(tf.float32, [None, self.rnn_hidden_units])
+            """
+            self.init_state = tf.placeholder(tf.float32, [None, self.rnn_hidden_units])
+            """
             self.init_state = tf.keras.Input(name="init_state", \
                                              shape=(None, self.rnn_hidden_units), \
                                              dtype=tf.dtypes.float32)
 
-        #self.alpha = tf.placeholder(tf.float32, [])  # Gradient reversal scalar
+        """
+        self.alpha = tf.placeholder(tf.float32, [])  # Gradient reversal scalar
+        """
         self.alpha = tf.keras.Input(name="alpha", \
                                     shape=(), \
                                     dtype=tf.dtypes.float32)
 
     def build_balancing_representation(self):
+        """
         self.rnn_input = tf.concat([self.current_covariates, self.previous_treatments], axis=-1)
+        """
+        self.rnn_input = tf.keras.layers.Concatenate(axis=-1)([self.current_covariates, self.previous_treatments])
+
+        # TO DO: Need to add masking layer before RNN layer to handle sequence_length!
         self.sequence_length = self.compute_sequence_length(self.rnn_input)
 
+        # Conversion: https://www.tensorflow.org/api_docs/python/tf/compat/v1/nn/dynamic_rnn
+        """
         rnn_cell = DropoutWrapper(LSTMCell(self.rnn_hidden_units, state_is_tuple=False),
                                   output_keep_prob=self.rnn_keep_prob,
                                   state_keep_prob=self.rnn_keep_prob,
                                   variational_recurrent=True,
                                   dtype=tf.float32)
+        """
+        lstm_cell  = tf.keras.layers.LSTMCell(self.rnn_hidden_units, \
+                                              activation="sigmoid")
 
         decoder_init_state = None
         if (self.b_train_decoder):
             decoder_init_state = tf.concat([self.init_state, self.init_state], axis=-1)
 
+        """
         rnn_output, _ = rnn.dynamic_rnn(
             rnn_cell,
             self.rnn_input,
             initial_state=decoder_init_state,
             dtype=tf.float32,
             sequence_length=self.sequence_length)
+        """
+        rnn_decoder = tf.keras.layers.RNN(lstm_cell, \
+                                          return_sequences=True, \
+                                          return_state=True)
+        rnn_output, d_state_h, d_state_c = rnn_decoder(self.rnn_input,
+            initial_state=decoder_init_state)
 
         # Flatten to apply same weights to all time steps.
         rnn_output = tf.reshape(rnn_output, [-1, self.rnn_hidden_units])
