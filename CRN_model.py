@@ -3,9 +3,11 @@
 import tensorflow as tf
 #import tensorflow.compat.v1 as tf
 #tf.disable_v2_behavior()
-#from tensorflow.contrib.rnn import LSTMCell, DropoutWrapper
-from tensorflow.compat.v1.nn.rnn_cell import LSTMCell, DropoutWrapper
+"""
+from tensorflow.contrib.rnn import LSTMCell, DropoutWrapper
 from tensorflow.python.ops import rnn
+"""
+#from tensorflow.compat.v1.nn.rnn_cell import LSTMCell, DropoutWrapper
 
 from utils.flip_gradient import flip_gradient
 import numpy as np
@@ -31,8 +33,13 @@ class CRN_Model:
 
         self.b_train_decoder = b_train_decoder
 
+        # "To migrate code that uses Graph-related functions to TF2, rewrite the code without them."
+        # Graphs are session-based, v2 is function based
+        # TO DO: Graph referenced in flip_gradient()
+        """
         tf.reset_default_graph()
-        #tf.compat.v1.reset_default_graph()
+        """
+
         """
         self.current_covariates = tf.placeholder(tf.float32, [None, self.max_sequence_length, self.num_covariates])
         """
@@ -94,6 +101,7 @@ class CRN_Model:
         self.sequence_length = self.compute_sequence_length(self.rnn_input)
 
         # Conversion: https://www.tensorflow.org/api_docs/python/tf/compat/v1/nn/dynamic_rnn
+        # Dropout: https://stackoverflow.com/questions/51824310/difference-between-keras-and-tensorflow-implementation-of-lstm-with-dropout
         """
         rnn_cell = DropoutWrapper(LSTMCell(self.rnn_hidden_units, state_is_tuple=False),
                                   output_keep_prob=self.rnn_keep_prob,
@@ -106,8 +114,13 @@ class CRN_Model:
 
         decoder_init_state = None
         if (self.b_train_decoder):
+            """
             decoder_init_state = tf.concat([self.init_state, self.init_state], axis=-1)
+            """
+            decoder_init_state = tf.keras.layers.Concatenate(axis=-1)([self.init_state, self.init_state])
 
+        # Setting the initial_state in the RNN layer: 
+        #    https://stackoverflow.com/questions/54567665/how-do-i-set-the-initial-state-of-a-keras-layers-rnn-instance
         """
         rnn_output, _ = rnn.dynamic_rnn(
             rnn_cell,
@@ -120,22 +133,34 @@ class CRN_Model:
                                           return_sequences=True, \
                                           return_state=True)
         rnn_output, d_state_h, d_state_c = rnn_decoder(self.rnn_input,
-            initial_state=decoder_init_state)
+                                                       initial_state=decoder_init_state)
 
+        # FOR DISCUSSION: Do we still need this?
+        #     Discussion: https://stackoverflow.com/questions/53670332/why-not-use-flatten-followed-by-a-dense-layer-instead-of-timedistributed
+        #     Dense in Keras 2 vs 3: https://stackoverflow.com/questions/47305618/what-is-the-role-of-timedistributed-layer-in-keras/47309453#47309453
+        """
         # Flatten to apply same weights to all time steps.
         rnn_output = tf.reshape(rnn_output, [-1, self.rnn_hidden_units])
         balancing_representation = tf.layers.dense(rnn_output, self.br_size, activation=tf.nn.elu)
+        """
+        balancing_representation = tf.keras.layers.Dense(units=self.br_size, activation=tf.nn.elu)(rnn_output)
 
         return balancing_representation
 
     def build_treatment_assignments_one_hot(self, balancing_representation):
+        # TO DO: Address flip gradient
         balancing_representation_gr = flip_gradient(balancing_representation, self.alpha)
-
-        #treatments_network_layer = tf.layers.dense(balancing_representation_gr, self.fc_hidden_units,
-        #                                           activation=tf.nn.elu)
+        
+        """
+        treatments_network_layer = tf.layers.dense(balancing_representation_gr, self.fc_hidden_units,
+                                                   activation=tf.nn.elu)
+        """
         treatments_network_layer = tf.keras.layers.Dense(units=self.fc_hidden_units, activation=tf.nn.elu)(balancing_representation_gr)
 
+        """
         treatment_logit_predictions = tf.layers.dense(treatments_network_layer, self.num_treatments, activation=None)
+        """
+        treatment_logit_predictions = tf.keras.layers.Dense(units=self.num_treatments, activation=None)(treatments_network_layer)
         treatment_prob_predictions = tf.nn.softmax(treatment_logit_predictions)
 
         return treatment_prob_predictions
