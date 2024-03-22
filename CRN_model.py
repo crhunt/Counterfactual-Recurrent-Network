@@ -73,9 +73,12 @@ class CRN_Model:
                                              shape=(None, self.max_sequence_length, self.num_outputs), \
                                              dtype=tf.dtypes.float32)
 
+        self.init_state = None
+        """
         self.init_state = tf.keras.Input(name="init_state", \
                                          shape=(), \
                                          dtype=tf.dtypes.float32)
+        """
         if (self.b_train_decoder):
             """
             self.init_state = tf.placeholder(tf.float32, [None, self.rnn_hidden_units])
