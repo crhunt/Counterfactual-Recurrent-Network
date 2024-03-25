@@ -25,12 +25,24 @@ while also updating the balanced representation. The model architecture is illus
 
 ## Dependencies
 
+This repo extends the original CRN_Model to TensorFlow v2. The original model is referenced as version `v1`. Two new versions are being developed:
+
+- `compat`: This version uses Tensorflow v2 (up to 2.15) and Keras 2 (up to 2.15) by taking advantage of backward compatibility functions.
+- `v2`: This is a rewrite of the model, migrated to Keras 3. (Still in progress.)
+
+### Original model (`v1`)
+
 The model was implemented in Python 3.6. The following packages are needed for running the model:
 - numpy==1.18.2
 - pandas==1.0.4
 - scipy==1.1.0
 - scikit-learn==0.22.2
 - tensorflow-gpu==1.15.0
+
+### Version `compat`
+
+- tensorflow==2.15.0
+- keras==2.15.0
 
 ## Running and evaluating the model:
 
