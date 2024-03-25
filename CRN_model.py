@@ -3,9 +3,13 @@
 from warnings import simplefilter 
 simplefilter(action='ignore', category=FutureWarning)
 
+'''
 import tensorflow as tf
 from tensorflow.contrib.rnn import LSTMCell, DropoutWrapper
 from tensorflow.python.ops import rnn
+'''
+
+from tensorflow_compat import tf, LSTMCell, DropoutWrapper, rnn
 
 from utils.flip_gradient import flip_gradient
 import numpy as np

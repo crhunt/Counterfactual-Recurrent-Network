@@ -6,6 +6,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+'''
 import os
 if 'CRN_VERSION' not in os.environ:
     logging.info("No env variable CRN_VERSION found. Defaulting to v1.")
@@ -16,6 +17,8 @@ elif "v1" == os.environ['CRN_VERSION']:
 else:
     import tensorflow.compat.v1 as tf
     tf.disable_v2_behavior()
+'''
+from tensorflow_compat import tf
 
 from tensorflow.python.framework import ops
 
