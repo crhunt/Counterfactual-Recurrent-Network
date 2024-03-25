@@ -13,7 +13,7 @@ def init_arg():
     parser.add_argument("--b_encoder_hyperparm_tuning", default=False)
     parser.add_argument("--b_decoder_hyperparm_tuning", default=False)
     parser.add_argument("--version", default="v1")
-    parser.add_argument("--load_data", default=True)
+    parser.add_argument("--load_data", default=False)
     return parser.parse_args()
 
 args = init_arg()

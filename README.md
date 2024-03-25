@@ -41,8 +41,18 @@ The model was implemented in Python 3.6. The following packages are needed for r
 
 ### Version `compat`
 
-- tensorflow==2.15.0
-- keras==2.15.0
+Should work with all v2 versions of TensorFlow and Keras up to 2.15. Below are the specs it was tested with.
+
+- python==3.11.5
+- numpy==1.23.5
+- pandas==2.1.4
+- scipy==1.12.0
+- tensorflow==2.12.0
+- keras==2.12.0
+
+### Version `v2`
+
+Still in development.
 
 ## Running and evaluating the model:
 
@@ -72,6 +82,8 @@ Options :
 	--model_name                         # Model name (used for saving the model).
 	--b_encoder_hyperparm_tuning         # Boolean flag for performing hyperparameter tuning for the encoder. 
 	--b_decoder_hyperparm_tuning         # Boolean flag for performing hyperparameter tuning for the decoder. 
+  --version                            # Version of CRN_Model. Options are "v1", "compat", "v2".
+  --load_data                          # Load data from a pickle file rather than generate for the test.
 ```
 
 Outputs:
