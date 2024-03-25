@@ -3,10 +3,8 @@
 from warnings import simplefilter 
 simplefilter(action='ignore', category=FutureWarning)
 
-#import tensorflow as tf
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
-#from tensorflow.contrib.rnn import LSTMCell, DropoutWrapper
 from tensorflow.compat.v1.nn.rnn_cell import LSTMCell, DropoutWrapper
 from tensorflow.python.ops import rnn
 

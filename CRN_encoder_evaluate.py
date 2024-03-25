@@ -3,7 +3,7 @@
 import logging
 import numpy as np
 
-from CRN_model import CRN_Model
+from CRN_models import CRN_Model
 from utils.evaluation_utils import write_results_to_file, load_trained_model, get_processed_data
 
 

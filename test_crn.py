@@ -19,17 +19,6 @@ def init_arg():
 args = init_arg()
 os.environ['CRN_VERSION'] = str(args.version)
 
-'''
-if args.version == "v1":
-    from CRN_model import CRN_Model
-elif args.version == "v2":
-    from CRN_model_v2 import CRN_Model
-elif args.version == "compat":
-    from CRN_model_compat import CRN_Model
-else:
-    raise ValueError("Invalid CRN_Model version.")
-'''
-
 from CRN_encoder_evaluate import test_CRN_encoder
 from CRN_decoder_evaluate import test_CRN_decoder
 from utils.cancer_simulation import get_cancer_sim_data

@@ -6,7 +6,7 @@ import numpy as np
 
 from utils.evaluation_utils import get_processed_data, get_mse_at_follow_up_time, \
     load_trained_model, write_results_to_file
-from CRN_model import CRN_Model
+from CRN_models import CRN_Model
 
 
 def fit_CRN_decoder(dataset_train, dataset_val, model_name, model_dir,
