@@ -18,19 +18,9 @@ class FlipGradientBuilder(object):
     def __call__(self, x, alpha):
         grad_name = "FlipGradient%d" % self.num_calls
 
-        # Custom gradients in Tensorflow v2: https://stackoverflow.com/questions/55764694/how-to-use-gradient-override-map-in-tensorflow-2-0
-
         @ops.RegisterGradient(grad_name)
         def _flip_gradients(op, grad):
             return [tf.negative(grad) * alpha]
-        """
-        # Convert the code above into tensorflow v2 
-        @tf.custom_gradient
-        def _flip_gradients(x):
-            def grad(dy):
-                return [-dy * alpha]
-            return tf.identity(x), grad
-        """
 
         g = tf.get_default_graph()
         with g.gradient_override_map({"Identity": grad_name}):
