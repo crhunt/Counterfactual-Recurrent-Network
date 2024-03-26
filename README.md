@@ -25,10 +25,7 @@ while also updating the balanced representation. The model architecture is illus
 
 ## Dependencies
 
-This repo extends the original CRN_Model to TensorFlow v2. The original model is referenced as version `v1`. Two new versions are being developed:
-
-- `compat`: This version uses Tensorflow v2 (up to 2.15) and Keras 2 (up to 2.15) by taking advantage of backward compatibility functions.
-- `v2`: This is a rewrite of the model, migrated to Keras 3. (Still in development.)
+This repo extends the original CRN_Model to TensorFlow v2. The original model is referenced as version `v1`. Two new version is referenced as `compat`: This version uses Tensorflow v2 (up to 2.15) and Keras 2 (up to 2.15) by taking advantage of backward compatibility functions.
 
 ### Original model (`v1`)
 
@@ -49,10 +46,6 @@ Should work with all v2 versions of TensorFlow and Keras up to 2.15. Below are t
 - scipy==1.12.0
 - tensorflow==2.12.0
 - keras==2.12.0
-
-### Version `v2`
-
-Still in development.
 
 ## Running and evaluating the model:
 
@@ -83,7 +76,7 @@ Options :
 	--b_encoder_hyperparm_tuning         # Boolean flag for performing hyperparameter tuning for the encoder. 
 	--b_decoder_hyperparm_tuning         # Boolean flag for performing hyperparameter tuning for the decoder. 
     --version                            # Version of CRN_Model. Options are "v1", "compat", "v2".
-    --load_data                          # Load data from a pickle file rather than generate for the test.
+    --load_data                          # Load data from a pickle file rather than generate for the test. (Default False.)
 ```
 
 Outputs:

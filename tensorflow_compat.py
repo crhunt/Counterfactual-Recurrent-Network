@@ -10,9 +10,6 @@ if "compat" == os.environ['CRN_VERSION']:
     tf.disable_v2_behavior()
     from tensorflow.compat.v1.nn.rnn_cell import LSTMCell, DropoutWrapper
     from tensorflow.python.ops import rnn
-elif "v2" == os.environ['CRN_VERSION']:
-    import tensorflow as tf
-    import keras
 else:
     if "v1" != os.environ['CRN_VERSION']:
         logging.info("Version CRN_VERSION not valid. Defaulting to v1.")
