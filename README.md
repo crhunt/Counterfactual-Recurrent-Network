@@ -83,7 +83,7 @@ Options :
 	--b_encoder_hyperparm_tuning         # Boolean flag for performing hyperparameter tuning for the encoder. 
 	--b_decoder_hyperparm_tuning         # Boolean flag for performing hyperparameter tuning for the decoder. 
     --version                            # Version of CRN_Model. Options are "v1", "compat", "v2".
-    --load_data                          # Load data from a pickle file rather than generate for the test.
+    --load_data                          # Load data from a pickle file rather than generate for the test. (Default False.)
 ```
 
 Outputs:
