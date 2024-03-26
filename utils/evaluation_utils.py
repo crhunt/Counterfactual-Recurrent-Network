@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from CRN_model import CRN_Model
+from CRN_models import CRN_Model
 
 import pickle
 

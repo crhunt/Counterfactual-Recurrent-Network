@@ -1,8 +1,9 @@
 # Copyright (c) 2020, Ioana Bica
 
-import tensorflow as tf
-from tensorflow.contrib.rnn import LSTMCell, DropoutWrapper
-from tensorflow.python.ops import rnn
+from warnings import simplefilter 
+simplefilter(action='ignore', category=FutureWarning)
+
+from tensorflow_compat import tf, LSTMCell, DropoutWrapper, rnn
 
 from utils.flip_gradient import flip_gradient
 import numpy as np
@@ -320,7 +321,7 @@ class CRN_Model:
         return balancing_reps
 
     def get_predictions(self, dataset):
-        logging.info("Performing one-step-ahed prediction.")
+        logging.info("Performing one-step-ahead prediction.")
         dataset_size = dataset['current_covariates'].shape[0]
 
         predictions = np.zeros(
